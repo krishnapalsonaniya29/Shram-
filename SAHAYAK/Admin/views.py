@@ -273,7 +273,11 @@
 
 #         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
+
+
 from django.shortcuts import render
+from django.contrib.auth import get_user_model
+
 from Worker.models import ReportWorkerModel, HourWage
 from Users.models import CustomUser, EmployerModel, WorkerModel
 from Employer.models import WorkersWorkModel
@@ -291,7 +295,7 @@ from django.db.models.functions import Concat
 from datetime import timedelta
 from django.utils import timezone
 
-from django.contrib.auth import get_user_model  # ✅ NEW
+User = get_user_model()
 
 # -------------------------------------------------------------------
 # Permissions
@@ -299,8 +303,11 @@ from django.contrib.auth import get_user_model  # ✅ NEW
 
 class IsAdminUser(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and request.user.is_superuser
-
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and request.user.is_superuser
+        )
 
 # -------------------------------------------------------------------
 # Admin APIs
@@ -310,22 +317,24 @@ class IsAdminUser(BasePermission):
 @permission_classes([IsAuthenticated, IsAdminUser])
 def all_employers(request):
     employers = CustomUser.objects.filter(role="employer")
-    all_employers = []
+    data = []
 
     for employer in employers:
-        employerProfile = EmployerModel.objects.filter(user=employer).values(
-            "contact_number",
+        profile = EmployerModel.objects.filter(user=employer).values(
             "id",
             "org_name",
+            "contact_number",
             address=F("location"),
-            emailId=F("user__email"),
-            employer=F("user__username")
+            email=F("user__email"),
+            username=F("user__username"),
         ).first()
-        all_employers.append(employerProfile)
+
+        if profile:
+            data.append(profile)
 
     return Response(
-        {"message": "All employers data sent.", "employers": all_employers},
-        status=status.HTTP_202_ACCEPTED
+        {"message": "All employers data sent.", "employers": data},
+        status=status.HTTP_200_OK
     )
 
 
@@ -333,23 +342,25 @@ def all_employers(request):
 @permission_classes([IsAuthenticated, IsAdminUser])
 def all_workers(request):
     workers = CustomUser.objects.filter(role="worker")
-    all_workers = []
+    data = []
 
     for worker in workers:
-        workerProfile = WorkerModel.objects.filter(user=worker).values(
-            "contact_number",
+        profile = WorkerModel.objects.filter(user=worker).values(
             "id",
+            "contact_number",
             "address",
             "skill",
             "gender",
-            workerUsername=F("user__username"),
-            workerName=Concat(F("user__first_name"), Value(' '), F("user__last_name"))
+            username=F("user__username"),
+            name=Concat(F("user__first_name"), Value(" "), F("user__last_name")),
         ).first()
-        all_workers.append(workerProfile)
+
+        if profile:
+            data.append(profile)
 
     return Response(
-        {"message": "All workers data sent.", "workers": all_workers},
-        status=status.HTTP_202_ACCEPTED
+        {"message": "All workers data sent.", "workers": data},
+        status=status.HTTP_200_OK
     )
 
 
@@ -357,23 +368,20 @@ def all_workers(request):
 @permission_classes([IsAuthenticated, IsAdminUser])
 def send_all_pending_reports(request):
     reports = ReportWorkerModel.objects.filter(status="pending")
-    all_reports = []
+    data = []
 
-    for report in reports:
-        worker = WorkerModel.objects.filter(id=report.worker.id).first()
-        employer = EmployerModel.objects.filter(id=report.employer.id).first()
-
-        all_reports.append({
-            "id": report.id,
-            "workerName": worker.user.username,
-            "employerName": employer.user.username,
-            "contact": worker.contact_number,
-            "reason": report.reason,
-            "message": report.message
+    for r in reports:
+        data.append({
+            "id": r.id,
+            "workerName": r.worker.user.username,
+            "employerName": r.employer.user.username,
+            "contact": r.worker.contact_number,
+            "reason": r.reason,
+            "message": r.message,
         })
 
     return Response(
-        {"message": "All pending reports sent.", "reports": all_reports},
+        {"message": "All pending reports sent.", "reports": data},
         status=status.HTTP_200_OK
     )
 
@@ -382,25 +390,22 @@ def send_all_pending_reports(request):
 @permission_classes([IsAuthenticated, IsAdminUser])
 def send_all_resolved_reports(request):
     reports = ReportWorkerModel.objects.filter(status="resolved")
-    all_reports = []
+    data = []
 
-    for report in reports:
-        worker = WorkerModel.objects.filter(id=report.worker.id).first()
-        employer = EmployerModel.objects.filter(id=report.employer.id).first()
-        resolved = ResolvedReportsModel.objects.filter(report=report).first()
-
-        all_reports.append({
-            "id": report.id,
-            "workerName": worker.user.username,
-            "employerName": employer.user.username,
-            "contact": worker.contact_number,
-            "reason": report.reason,
-            "message": report.message,
-            "adminResponse": resolved.admin_message if resolved else "No response by admin."
+    for r in reports:
+        resolved = ResolvedReportsModel.objects.filter(report=r).first()
+        data.append({
+            "id": r.id,
+            "workerName": r.worker.user.username,
+            "employerName": r.employer.user.username,
+            "contact": r.worker.contact_number,
+            "reason": r.reason,
+            "message": r.message,
+            "adminResponse": resolved.admin_message if resolved else None,
         })
 
     return Response(
-        {"message": "All resolved reports sent.", "reports": all_reports},
+        {"message": "All resolved reports sent.", "reports": data},
         status=status.HTTP_200_OK
     )
 
@@ -409,33 +414,44 @@ def send_all_resolved_reports(request):
 @permission_classes([IsAuthenticated, IsAdminUser])
 def resolve_complaint(request):
     report_id = request.data.get("id")
-    response_msg = request.data.get("response")
+    admin_msg = request.data.get("response")
+
+    if not report_id or not admin_msg:
+        return Response(
+            {"error": "id and response are required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     if ResolvedReportsModel.objects.filter(report_id=report_id).exists():
-        return Response({"message": "Report already resolved"}, status=status.HTTP_202_ACCEPTED)
+        return Response(
+            {"message": "Report already resolved"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     report = ReportWorkerModel.objects.filter(id=report_id).first()
     if not report:
-        return Response({"message": "Report not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {"error": "Report not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
 
     ResolvedReportsModel.objects.create(
         report=report,
-        admin_message=response_msg
+        admin_message=admin_msg
     )
 
     report.status = "resolved"
     report.save()
 
-    return Response({"message": "Report resolved successfully"}, status=status.HTTP_202_ACCEPTED)
+    return Response(
+        {"message": "Report resolved successfully"},
+        status=status.HTTP_200_OK
+    )
 
 
 # -------------------------------------------------------------------
-# 🔴 TEMPORARY DEV-ONLY SUPERUSER CREATOR
+# TEMP DEV ONLY – REMOVE AFTER FIRST USE
 # -------------------------------------------------------------------
-# USE ONLY ONCE → THEN DELETE
-# -------------------------------------------------------------------
-
-User = get_user_model()
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -453,11 +469,15 @@ def create_initial_superuser(request):
     )
 
     return Response(
-        {"success": "Superuser created successfully"},
+        {"success": "Superuser created"},
         status=status.HTTP_201_CREATED
     )
 
-#-----temp
+
+# -------------------------------------------------------------------
+# Employer / Worker detail
+# -------------------------------------------------------------------
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def get_employer_data(request, username):
@@ -469,24 +489,31 @@ def get_employer_data(request, username):
         "org_name",
         "location",
         "contact_number",
-        employerUsername=F("user__username"),
-        employerEmail=F("user__email"),
+        username=F("user__username"),
+        email=F("user__email"),
     ).first()
 
     if not employer:
         return Response({"error": "Employer profile not found"}, status=404)
 
-    pending = ReportWorkerModel.objects.filter(employer__user=user, status="pending").count()
-    resolved = ReportWorkerModel.objects.filter(employer__user=user, status="resolved").count()
+    pending = ReportWorkerModel.objects.filter(
+        employer__user=user, status="pending"
+    ).count()
+    resolved = ReportWorkerModel.objects.filter(
+        employer__user=user, status="resolved"
+    ).count()
 
-    return Response({
-        "employer": employer,
-        "reports": {
-            "pending": pending,
-            "resolved": resolved,
-            "total": pending + resolved
-        }
-    }, status=200)
+    return Response(
+        {
+            "employer": employer,
+            "reports": {
+                "pending": pending,
+                "resolved": resolved,
+                "total": pending + resolved,
+            },
+        },
+        status=status.HTTP_200_OK,
+    )
 
 
 @api_view(['GET'])
@@ -501,24 +528,32 @@ def get_worker_data(request, username):
         "address",
         "gender",
         "contact_number",
-        workerUsername=F("user__username"),
-        workerName=Concat(F("user__first_name"), Value(' '), F("user__last_name"))
+        username=F("user__username"),
+        name=Concat(F("user__first_name"), Value(" "), F("user__last_name")),
     ).first()
 
     if not worker:
         return Response({"error": "Worker profile not found"}, status=404)
 
-    pending = ReportWorkerModel.objects.filter(worker__user=user, status="pending").count()
-    resolved = ReportWorkerModel.objects.filter(worker__user=user, status="resolved").count()
+    pending = ReportWorkerModel.objects.filter(
+        worker__user=user, status="pending"
+    ).count()
+    resolved = ReportWorkerModel.objects.filter(
+        worker__user=user, status="resolved"
+    ).count()
 
-    return Response({
-        "worker": worker,
-        "reports": {
-            "pending": pending,
-            "resolved": resolved,
-            "total": pending + resolved
-        }
-    }, status=200)
+    return Response(
+        {
+            "worker": worker,
+            "reports": {
+                "pending": pending,
+                "resolved": resolved,
+                "total": pending + resolved,
+            },
+        },
+        status=status.HTTP_200_OK,
+    )
+
 
 # -------------------------------------------------------------------
 # JWT LOGIN
@@ -528,7 +563,7 @@ class AdminTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        token['role'] = user.role
+        token["role"] = user.role
         return token
 
 
@@ -544,7 +579,7 @@ class AdminLoginView(TokenObtainPairView):
         if not user or not user.is_superuser or not user.check_password(password):
             return Response(
                 {"message": "Invalid credentials or unauthorized"},
-                status=status.HTTP_401_UNAUTHORIZED
+                status=status.HTTP_401_UNAUTHORIZED,
             )
 
         serializer = self.get_serializer(data=request.data)
