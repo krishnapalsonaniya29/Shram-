@@ -585,3 +585,108 @@ class AdminLoginView(TokenObtainPairView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def filter_worker_by_employer_date(request, employer_id):
+    date_str = request.GET.get("date")
+    if not date_str:
+        return Response({"error": "date is required"}, status=400)
+
+    year, month, day = date_str.split("-")
+
+    workers = WorkersWorkModel.objects.filter(
+        date__year=year,
+        date__month=month,
+        date__day=day,
+        employer_id=employer_id
+    ).values(
+        "date",
+        "amount",
+        "amount_given",
+        workerUsername=F("worker__user__username"),
+    )
+
+    return Response(
+        {"message": "Workers fetched successfully", "workers": workers},
+        status=200
+    )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def filter_worker_work_by_date(request, worker_id):
+    date_str = request.GET.get("date")
+    if not date_str:
+        return Response({"error": "date is required"}, status=400)
+
+    year, month, day = date_str.split("-")
+
+    work = WorkersWorkModel.objects.filter(
+        date__year=year,
+        date__month=month,
+        date__day=day,
+        worker_id=worker_id
+    ).values(
+        "amount",
+        "date",
+        "attendance__shift",
+        orgName=F("employer__org_name"),
+        workerUsername=F("worker__user__username"),
+        entryTime=F("attendance__entry_time"),
+        leavingTime=F("attendance__leaving_time"),
+        overtimeEntryTime=F("attendance__overtime_entry_time"),
+        overtimeLeavingTime=F("attendance__overtime_leaving_time"),
+    )
+
+    return Response(
+        {"message": "Worker work fetched", "worker": work},
+        status=200
+    )
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def wage_authority_for_admin(request):
+    if request.method == "GET":
+        wage = HourWage.objects.last()
+        if not wage:
+            return Response({"error": "No wage found"}, status=404)
+
+        return Response({
+            "hourWage": wage.hourly_wage,
+            "overtimeWage": wage.overtime_wage
+        }, status=200)
+
+    if request.method == "POST":
+        hour = request.data.get("hourWage")
+        overtime = request.data.get("overtimeWage")
+
+        if not hour or not overtime:
+            return Response({"error": "Invalid data"}, status=400)
+
+        HourWage.objects.create(
+            hourly_wage=hour,
+            overtime_wage=overtime
+        )
+
+        return Response({"message": "Wage updated"}, status=200)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def day_wise_stats(request):
+    days = int(request.GET.get("time", 1))
+    from_date = timezone.now() - timedelta(days=days)
+
+    stats = WorkersWorkModel.objects.filter(date__gte=from_date).aggregate(
+        shift1=Count("id", filter=Q(attendance__shift="shift1")),
+        shift2=Count("id", filter=Q(attendance__shift="shift2")),
+        overtime=Count("id", filter=Q(attendance__overtime=True)),
+    )
+
+    return Response(
+        {"message": "Stats fetched", "stats": stats},
+        status=200
+    )
