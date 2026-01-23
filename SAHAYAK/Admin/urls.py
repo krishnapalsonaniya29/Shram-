@@ -6,9 +6,9 @@ from rest_framework_simplejwt.views import (
 
 
 urlpatterns = [
-    urlpatterns = [
+    
     path("dev/create-superuser/", views.create_initial_superuser),
-]
+
     path('login/', views.AdminLoginView.as_view(), name='admin_login'),
     path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('all-employers/', views.all_employers, name='all_employers'),
