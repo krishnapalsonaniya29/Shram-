@@ -1,0 +1,343 @@
+body {
+  margin: 0;
+  font-family: "Noto Sans Devanagari", "Segoe UI", Tahoma, sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  line-height: 1.6;
+}
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(
+      to bottom right,
+      rgba(255, 153, 51, 0.1),
+      rgba(255, 255, 255, 0.8),
+      rgba(19, 136, 8, 0.1)
+    ),
+    url("https://www.transparenttextures.com/patterns/clean-textile.png");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2.5rem 1.25rem;
+  box-sizing: border-box;
+}
+
+.overlay {
+  display: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 56.25rem;
+  padding: 3.125rem;
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0.75rem 1.875rem rgba(0, 0, 0, 0.15);
+  animation: fadeIn 1.5s ease-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.hero-logo {
+  width: 8.125rem;
+  height: 8.125rem;
+  margin-bottom: 1.5625rem;
+  box-shadow: 0 0 0.9375rem rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  object-fit: contain;
+}
+
+.hero-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  color: #002147;
+  margin-bottom: 0.9375rem;
+  letter-spacing: -0.03125rem;
+}
+
+.hero-subtext {
+  font-size: 1.25rem;
+  color: #555;
+  max-width: 37.5rem;
+}
+
+.info-section {
+  width: 100%;
+  margin: 0;
+  padding: 5rem 3rem;
+  background-color: #ffffff;
+  border-top: 4px solid #f7931d;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: 2.5rem;
+  box-sizing: border-box;
+}
+
+.info-card {
+  flex: 1 1 320px;
+  max-width: 380px;
+  background: #ffffff;
+  border-radius: 1.25rem;
+  border: 1px solid #e6eaf0;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem 2rem;
+  transition: all 0.3s ease;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.info-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+  border-color: #f7931d;
+}
+
+.info-card h3 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #002147;
+  margin-bottom: 1rem;
+}
+
+.info-card p {
+  font-size: 1.05rem;
+  color: #555;
+  line-height: 1.7;
+  font-weight: 500;
+  text-align: justify;
+}
+
+.wage-section {
+  width: 100%;
+  background-color: #fafafa;
+  border-top: 0.3125rem solid #4caf50;
+  box-shadow: 0 -0.3125rem 0.9375rem rgba(0, 0, 0, 0.05);
+  padding: 4rem 2rem;
+  text-align: center;
+  animation: fadeIn 1.2s ease;
+}
+
+.wage-section h2 {
+  font-size: 2rem;
+  color: #003366;
+  margin-bottom: 2.5rem;
+  font-weight: 700;
+}
+
+.wage-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.wage-card {
+  background: #ffffff;
+  border: 0.0625rem solid #e0e0e0;
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 20rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.wage-card:hover {
+  transform: translateY(-0.5rem);
+  box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.15);
+}
+
+.wage-card h4 {
+  font-size: 1.25rem;
+  color: #002147;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.wage-card input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 0.0625rem solid #ccc;
+  border-radius: 0.5rem;
+  margin-bottom: 0.9375rem;
+  outline: none;
+  transition: border 0.2s ease;
+}
+
+.wage-card input:focus {
+  border-color: #4caf50;
+}
+
+.wage-card p {
+  color: #333;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.update-button {
+  margin-top: 2.5rem;
+  padding: 0.875rem 2rem;
+  background: linear-gradient(90deg, #43a047, #2e7d32);
+  color: #fff;
+  font-size: 1.125rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.625rem;
+  cursor: pointer;
+  box-shadow: 0 0.5rem 1.5rem rgba(67, 160, 71, 0.3);
+  transition: all 0.3s ease;
+}
+
+.update-button:hover {
+  background: linear-gradient(90deg, #2e7d32, #1b5e20);
+  transform: translateY(-0.2rem);
+  box-shadow: 0 0.75rem 2rem rgba(46, 125, 50, 0.4);
+}
+
+.current-wage-display {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.wage-display-card {
+  background: #ffffff;
+  border: 0.0625rem solid #dcdcdc;
+  border-radius: 1rem;
+  padding: 1.5rem 2rem;
+  width: 18rem;
+  box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.wage-display-card:hover {
+  transform: translateY(-0.3rem);
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.12);
+}
+
+.wage-display-card h4 {
+  font-size: 1.25rem;
+  color: #004aad;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.wage-value {
+  font-size: 1.375rem;
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.stats-section {
+  width: 85%;
+  max-width: 900px;
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-top: 3rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+  animation: fadeIn 1s ease-in-out;
+  margin-bottom: 3rem;
+}
+
+.stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.stats-header h2 {
+  font-size: 1.75rem;
+  color: #003366;
+  font-weight: 700;
+}
+
+.stats-header select {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  outline: none;
+}
+
+.bar-container {
+  width: 100%;
+  height: 400px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(2.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 56.25em) {
+  .hero-title {
+    font-size: 2.25rem;
+  }
+  .hero-subtext {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 37.5em) {
+  .hero-section {
+    min-height: 60vh;
+    padding: 1.875rem 0.9375rem;
+  }
+  .hero-content {
+    padding: 1.875rem;
+    align-items: center;
+  }
+  .hero-logo {
+    width: 6.25rem;
+    height: 6.25rem;
+  }
+  .hero-title {
+    font-size: 1.875rem;
+  }
+  .hero-subtext {
+    font-size: 1rem;
+  }
+  .info-section {
+    padding: 3.125rem 1.25rem;
+  }
+  .info-card {
+    max-width: 100%;
+    padding: 1.5625rem;
+  }
+  .wage-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+}
