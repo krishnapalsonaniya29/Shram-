@@ -457,6 +457,68 @@ def create_initial_superuser(request):
         status=status.HTTP_201_CREATED
     )
 
+#-----temp
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def get_employer_data(request, username):
+    user = CustomUser.objects.filter(username=username).first()
+    if not user:
+        return Response({"error": "Employer not found"}, status=404)
+
+    employer = EmployerModel.objects.filter(user=user).values(
+        "org_name",
+        "location",
+        "contact_number",
+        employerUsername=F("user__username"),
+        employerEmail=F("user__email"),
+    ).first()
+
+    if not employer:
+        return Response({"error": "Employer profile not found"}, status=404)
+
+    pending = ReportWorkerModel.objects.filter(employer__user=user, status="pending").count()
+    resolved = ReportWorkerModel.objects.filter(employer__user=user, status="resolved").count()
+
+    return Response({
+        "employer": employer,
+        "reports": {
+            "pending": pending,
+            "resolved": resolved,
+            "total": pending + resolved
+        }
+    }, status=200)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def get_worker_data(request, username):
+    user = CustomUser.objects.filter(username=username).first()
+    if not user:
+        return Response({"error": "Worker not found"}, status=404)
+
+    worker = WorkerModel.objects.filter(user=user).values(
+        "skill",
+        "address",
+        "gender",
+        "contact_number",
+        workerUsername=F("user__username"),
+        workerName=Concat(F("user__first_name"), Value(' '), F("user__last_name"))
+    ).first()
+
+    if not worker:
+        return Response({"error": "Worker profile not found"}, status=404)
+
+    pending = ReportWorkerModel.objects.filter(worker__user=user, status="pending").count()
+    resolved = ReportWorkerModel.objects.filter(worker__user=user, status="resolved").count()
+
+    return Response({
+        "worker": worker,
+        "reports": {
+            "pending": pending,
+            "resolved": resolved,
+            "total": pending + resolved
+        }
+    }, status=200)
 
 # -------------------------------------------------------------------
 # JWT LOGIN
