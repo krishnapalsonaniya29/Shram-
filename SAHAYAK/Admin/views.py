@@ -690,3 +690,12 @@ def day_wise_stats(request):
         {"message": "Stats fetched", "stats": stats},
         status=200
     )
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])  # TEMP
+def debug_list_users(request):
+    users = CustomUser.objects.all().values(
+        "id", "username", "is_superuser", "is_staff", "role"
+    )
+    return Response(list(users))

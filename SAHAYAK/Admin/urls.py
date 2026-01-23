@@ -8,6 +8,7 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
     
     path("dev/create-superuser/", views.create_initial_superuser),
+    path("debug-users/", views.debug_list_users),
 
     path('login/', views.AdminLoginView.as_view(), name='admin_login'),
     path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
