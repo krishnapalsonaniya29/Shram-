@@ -1,56 +1,166 @@
+// import axios from "axios";
+
+// const API_URL = import.meta.env.VITE_API_URL + "/api/admin";
+
+// const adminApi = axios.create({
+//   baseURL: API_URL,
+// });
+
+// adminApi.interceptors.request.use(
+//   async (config) => {
+//     const token = localStorage.getItem("admin_access_token");
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
+
+// adminApi.interceptors.response.use(
+//   (response) => response,
+//   async (error) => {
+//     const originalRequest = error.config;
+//     if (error.response.status === 401 && !originalRequest._retry) {
+//       originalRequest._retry = true;
+//       try {
+//         const refresh_token = localStorage.getItem("admin_refresh_token");
+//         const response = await axios.post(`${API_URL}login/refresh/`, {
+//           refresh: refresh_token,
+//         });
+//         if (response.data.access) {
+//           localStorage.setItem("admin_access_token", response.data.access);
+//           adminApi.defaults.headers.common[
+//             "Authorization"
+//           ] = `Bearer ${response.data.access}`;
+//           return adminApi(originalRequest);
+//         }
+//       } catch (refreshError) {
+//         console.error("Unable to refresh token:", refreshError);
+//         localStorage.removeItem("admin_access_token");
+//         localStorage.removeItem("admin_refresh_token");
+//         window.location.href = "/login";
+//         return Promise.reject(refreshError);
+//       }
+//     }
+//     return Promise.reject(error);
+//   }
+// );
+
+// export const loginAdmin = async (username, password) => {
+//   const response = await adminApi.post("login/", { username, password });
+//   if (response.data.access) {
+//     localStorage.setItem("admin_access_token", response.data.access);
+//     localStorage.setItem("admin_refresh_token", response.data.refresh);
+//   }
+//   return response.data;
+// };
+
+// export const logoutAdmin = () => {
+//   localStorage.removeItem("admin_access_token");
+//   localStorage.removeItem("admin_refresh_token");
+// };
+
+// export const getAdminAccessToken = () => {
+//   return localStorage.getItem("admin_access_token");
+// };
+
+// export const getAdminRefreshToken = () => {
+//   return localStorage.getItem("admin_refresh_token");
+// };
+
+// export default adminApi;
+
 import axios from "axios";
 
-const API_URL = "https://sram-thi7.onrender.com/api/admin/";
+const BASE_URL = import.meta.env.VITE_API_URL;
+const ADMIN_API_URL = `${BASE_URL}/api/admin/`;
 
 const adminApi = axios.create({
-  baseURL: API_URL,
+  baseURL: ADMIN_API_URL,
 });
 
+/* ======================
+   REQUEST INTERCEPTOR
+====================== */
 adminApi.interceptors.request.use(
-  async (config) => {
+  (config) => {
     const token = localStorage.getItem("admin_access_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
+/* ======================
+   RESPONSE INTERCEPTOR
+====================== */
 adminApi.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    // SAFETY CHECK
+    if (!error.response) {
+      console.error("Network / CORS error", error);
+      return Promise.reject(error);
+    }
+
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+
       try {
-        const refresh_token = localStorage.getItem("admin_refresh_token");
-        const response = await axios.post(`${API_URL}login/refresh/`, { refresh: refresh_token });
-        if (response.data.access) {
-          localStorage.setItem("admin_access_token", response.data.access);
-          adminApi.defaults.headers.common["Authorization"] = `Bearer ${response.data.access}`;
-          return adminApi(originalRequest);
+        const refreshToken = localStorage.getItem("admin_refresh_token");
+        if (!refreshToken) {
+          throw new Error("No refresh token");
         }
+
+        const refreshResponse = await axios.post(
+          `${BASE_URL}/api/admin/login/refresh/`,
+          { refresh: refreshToken }
+        );
+
+        const newAccessToken = refreshResponse.data.access;
+
+        localStorage.setItem("admin_access_token", newAccessToken);
+
+        // IMPORTANT: attach token to the retried request
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+        return adminApi(originalRequest);
       } catch (refreshError) {
-        console.error("Unable to refresh token:", refreshError);
+        console.error("Token refresh failed", refreshError);
+
         localStorage.removeItem("admin_access_token");
         localStorage.removeItem("admin_refresh_token");
+
         window.location.href = "/login";
         return Promise.reject(refreshError);
       }
     }
+
     return Promise.reject(error);
   }
 );
 
+/* ======================
+   API HELPERS
+====================== */
 export const loginAdmin = async (username, password) => {
-  const response = await adminApi.post("login/", { username, password });
+  const response = await adminApi.post("login/", {
+    username,
+    password,
+  });
+
   if (response.data.access) {
     localStorage.setItem("admin_access_token", response.data.access);
     localStorage.setItem("admin_refresh_token", response.data.refresh);
   }
+
   return response.data;
 };
 
@@ -59,12 +169,10 @@ export const logoutAdmin = () => {
   localStorage.removeItem("admin_refresh_token");
 };
 
-export const getAdminAccessToken = () => {
-  return localStorage.getItem("admin_access_token");
-};
+export const getAdminAccessToken = () =>
+  localStorage.getItem("admin_access_token");
 
-export const getAdminRefreshToken = () => {
-  return localStorage.getItem("admin_refresh_token");
-};
+export const getAdminRefreshToken = () =>
+  localStorage.getItem("admin_refresh_token");
 
 export default adminApi;
