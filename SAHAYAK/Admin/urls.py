@@ -3,6 +3,7 @@ from . import views
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
+
 from .views import seed_super_admin
 
 
@@ -11,7 +12,8 @@ urlpatterns = [
     # path("create-superuser/", views.create_initial_superuser),
     path("seed-super-admin/", seed_super_admin),
 
-    path("dev/create-superuser/", views.create_initial_superuser),
+   # path("dev/create-superuser/", views.create_initial_superuser),
+    path("seed-super-admin/", seed_super_admin),
     path("debug-users/", views.debug_list_users),
 
     path('login/', views.AdminLoginView.as_view(), name='admin_login'),
