@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "SRAM",
-    "slug": "SAHAYAK-frontend",
+    "slug": "sahayak-frontend",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
@@ -45,10 +45,11 @@
       "expo-asset"
     ],
     "extra": {
+      "router": {},
       "eas": {
-        "projectId": "42e93b59-f765-4c57-9787-98317f108a47"
+        "projectId": "e6bfe991-493f-47d3-924d-05c97b15dcff"
       }
     },
-    "owner": "prabal4691"
+    "owner": "kunal223"
   }
 }

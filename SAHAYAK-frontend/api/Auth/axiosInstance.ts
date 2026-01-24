@@ -6,12 +6,18 @@ type LogoutFn = () => Promise<void> | void;
 let refreshAccessTokenFn: RefreshAccessTokenFn | null = null;
 let logoutFn: LogoutFn | null = null;
 
-export const setAuthCallbacks = (refreshFn: RefreshAccessTokenFn, onLogout: LogoutFn) => {
+export const setAuthCallbacks = (
+  refreshFn: RefreshAccessTokenFn,
+  onLogout: LogoutFn
+) => {
   refreshAccessTokenFn = refreshFn;
   logoutFn = onLogout;
 };
 
-const API_URL = "https://sram-thi7.onrender.com/api";
+//old url
+// const API_URL = "https://sram-thi7.onrender.com/api";
+//new url
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 const apiClient = axios.create({
   baseURL: API_URL,
@@ -22,8 +28,16 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    const isRefreshRequest = typeof originalRequest?.url === "string" && originalRequest.url.includes("/token/refresh/");
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !isRefreshRequest && refreshAccessTokenFn) {
+    const isRefreshRequest =
+      typeof originalRequest?.url === "string" &&
+      originalRequest.url.includes("/token/refresh/");
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !isRefreshRequest &&
+      refreshAccessTokenFn
+    ) {
       originalRequest._retry = true;
       const newAccess = await refreshAccessTokenFn();
       if (newAccess) {
