@@ -7,6 +7,7 @@ body {
 }
 
 .home-container {
+  background-color:#003366;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -79,7 +80,7 @@ body {
   width: 100%;
   margin: 0;
   padding: 5rem 3rem;
-  background-color: #ffffff;
+  background-color: #002147;
   border-top: 4px solid #f7931d;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
   display: flex;
@@ -128,7 +129,7 @@ body {
 
 .wage-section {
   width: 100%;
-  background-color: #fafafa;
+  background-color: #002147;
   border-top: 0.3125rem solid #4caf50;
   box-shadow: 0 -0.3125rem 0.9375rem rgba(0, 0, 0, 0.05);
   padding: 4rem 2rem;

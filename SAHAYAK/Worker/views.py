@@ -523,3 +523,15 @@ def get_worker_data_by_date(request):
             "totalAmount": attendance[0]["totalAmount"]
         }
         return Response({"message": "Attendance Data sent", "data": data}, status=status.HTTP_200_OK)
+
+
+#delete fun
+
+@api_view(['DELETE'])
+def delete_worker(request, pk):
+    try:
+        worker = WorkerModel.objects.get(id=pk)
+        worker.delete()
+        return Response({"message": "Worker deleted successfully"}, status=status.HTTP_200_OK)
+    except WorkerModel.DoesNotExist:
+        return Response({"error": "Worker not found"}, status=status.HTTP_404_NOT_FOUND)

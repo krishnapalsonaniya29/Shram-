@@ -88,7 +88,7 @@ function Home() {
         <div className="overlay"></div>
         <div className="hero-content">
           <img src={logo} alt="Madhya Pradesh Government Logo" className="hero-logo" />
-          <h1 className="hero-title">मध्यप्रदेश श्रम मंत्रालय में आपका स्वागत है।</h1>
+          <h1 className="hero-title"> श्रम विभाग मध्य प्रदेश  में आपका स्वागत है </h1>
           <p className="hero-subtext">
             राज्य के श्रमिकों के अधिकार, सुरक्षा और कल्याण के लिए समर्पित।
           </p>

@@ -492,3 +492,15 @@ def update_wage_given_status(request):
         work.amount_given = True
         work.save()
         return Response({"message": "Worker salary given by Employer"}, status=status.HTTP_200_OK)
+
+
+
+        #delete employer 
+@api_view(['DELETE'])
+def delete_employer(request, pk):
+    try:
+        employer = EmployerModel.objects.get(id=pk)
+        employer.delete()
+        return Response({"message": "Employer deleted successfully"}, status=status.HTTP_200_OK)
+    except EmployerModel.DoesNotExist:
+        return Response({"error": "Employer not found"}, status=status.HTTP_404_NOT_FOUND)

@@ -1,5 +1,5 @@
 import adminApi from "../adminAxios";
-
+import mainApi from "../mainAxios";
 export const getWorkerData = async (username) => {
   try {
     const response = await adminApi.get(`get-worker-data/${username}/`);
@@ -64,3 +64,7 @@ export const allWorkerStatsDayWise = async (days) => {
       return {shift1_count: 0, shift2_count: 0, overtimeCount: 0}
   }
 }
+//delete fun
+export const deleteWorker = (id) => {
+  return mainApi.delete(`worker/delete/${id}/`);
+};

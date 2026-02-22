@@ -154,7 +154,10 @@ body {
 .work-history-table tbody tr:last-child td {
   border-bottom: none;
 }
-
+.action-buttons {
+  display: flex;
+  gap: 50 px;
+}
 .no-data {
   text-align: center;
   color: #777;
@@ -483,4 +486,26 @@ body {
 
 .report-box.resolved {
   background: linear-gradient(135deg, #10b981, #059669);
+}
+/* ===== DELETE BUTTON STYLE ===== */
+.delete-btn {
+  background-color: #e53935;
+  /* margin-left: 20px; */
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.delete-btn:hover {
+  background-color: #c62828;
+  transform: scale(1.05);
+}
+
+.delete-btn:active {
+  transform: scale(0.95);
 }

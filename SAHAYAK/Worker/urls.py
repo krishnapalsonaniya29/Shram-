@@ -1,5 +1,6 @@
 from django.urls import path, include
 from Worker import views
+from .views import delete_worker
 
 urlpatterns = [
     path('salary/<int:month>/<int:year>/', views.fetch_this_month_salary, name="This Month Salary"),
@@ -15,5 +16,6 @@ urlpatterns = [
     path('receiptPDF/<str:id>/', views.get_pdf_data, name="Data for receipt"),
     path('all-reports/', views.get_all_reports_with_status, name="All Reports reported by worker"),
     path('monthly-attendance/', views.get_attendance_by_month, name="Month Attendance of worker"),
-    path('filter-attendance-data/', views.get_worker_data_by_date, name="Date wise attendance of worker")
+    path('filter-attendance-data/', views.get_worker_data_by_date, name="Date wise attendance of worker"),
+    path('delete/<int:pk>/', delete_worker, name='delete_worker'),
 ]

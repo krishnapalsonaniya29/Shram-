@@ -5,6 +5,7 @@ import {
   getAllWorkers,
   getWorkerWorkHistory,
 } from "../api/workerRoutes/allWorkers";
+import { deleteWorker } from "../api/workerRoutes/allWorkers";
 
 function Workers() {
   const [workers, setWorkers] = useState([]);
@@ -82,7 +83,15 @@ function Workers() {
     };
     fetchWorkerData();
   }, [selectedWorker]);
-
+const handleDelete = async (id) => {
+  try {
+    await deleteWorker(id);
+    alert("Worker deleted successfully");
+    fetchWorkers(); // refresh list
+  } catch (error) {
+    console.error("Error deleting worker:", error);
+  }
+};
   return (
     <div className="workers-page">
       <div className="workers-container">
@@ -123,13 +132,22 @@ function Workers() {
                         <td>{worker.workerUsername}</td>
                         <td>{worker.skill}</td>
                         <td>
+                          <div className="action-buttons">
                           <button
                             className="view-btn"
                             onClick={() => setSelectedWorker(worker)}
                           >
                             View Profile
                           </button>
+                          <button
+  className="delete-btn"
+  onClick={() => handleDelete(worker.id)}
+>
+  Delete
+</button>
+</div>
                         </td>
+                          
                       </tr>
                     ))
                   ) : (

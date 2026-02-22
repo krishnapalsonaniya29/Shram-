@@ -563,3 +563,25 @@
   }
 }
 
+
+/* ===== DELETE BUTTON STYLE ===== */
+.delete-btn {
+  background-color: #e53935;
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.delete-btn:hover {
+  background-color: #c62828;
+  transform: scale(1.05);
+}
+
+.delete-btn:active {
+  transform: scale(0.95);
+}

@@ -1,6 +1,6 @@
 from django.urls import path, include
 from Employer import views
-
+from .views import delete_employer
 urlpatterns = [
     path('work/works-on/', views.get_all_workers_worked_on_date, name="All Workers of Employer"),
     path('work/mark-entry-time/', views.mark_entry_time, name="Mark Entry Time"),
@@ -16,5 +16,7 @@ urlpatterns = [
     path('profile/', views.get_employer_data, name="Employer Profile"),
     path('filter-attendance-data/', views.get_attendance_data_by_date, name="Attendance Data Date wise"),
     path('get-workers-salary/', views.get_worker_salary, name="Workers Salary"),
-    path('update-worker-salary-status/', views.update_wage_given_status, name="Worker Salary given by Employer")
+    path('update-worker-salary-status/', views.update_wage_given_status, name="Worker Salary given by Employer"),
+    #delete path
+    path('delete/<int:pk>/', delete_employer, name='delete_employer'),
 ]

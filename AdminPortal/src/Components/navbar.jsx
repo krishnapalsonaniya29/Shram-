@@ -21,7 +21,7 @@ function Navbar() {
         style={{ cursor: "pointer" }}
       >
         <img src={logo} alt="MP Govt Logo" />
-        <span>मध्यप्रदेश श्रम मंत्रालय</span>
+        <span>श्रम विभाग मध्य प्रदेश </span>
       </div>
 
       <ul className="nav-links">

@@ -5,7 +5,7 @@ import {
   getEmployerData,
 } from "../api/employerRoutes/allEmployers";
 import { getAttendanceByEmployerAndDate } from "../api/employerRoutes/attendanceData";
-
+import { deleteEmployer } from "../api/employerRoutes/allEmployers";
 function Employer() {
   const [employers, setEmployers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,21 +20,55 @@ function Employer() {
   const [attendanceData, setAttendanceData] = useState([]);
   const [loadingAttendance, setLoadingAttendance] = useState(false);
 
+//   const fetchEmployerData = async () => {
+//   try {
+//     const response = await getAllEmployers();
+//     const employersData =
+//       response && response.employers ? response.employers.flat() : [];
+//     const sortedData = employersData.sort((a, b) => a.id - b.id);
+//     setEmployers(sortedData);
+//   } catch (error) {
+//     console.error("Error fetching employers:", error);
+//   }
+// };
+
+const fetchEmployerData = async () => {
+  try {
+    const response = await getAllEmployers();
+
+    const employersData =
+      response && response.employers
+        ? response.employers.flat().filter((emp) => emp && emp.id)
+        : [];
+
+    const sortedData = employersData.sort((a, b) => a.id - b.id);
+
+    setEmployers(sortedData);
+  } catch (error) {
+    console.error("Error fetching employers:", error);
+  }
+};
+
+
+  // useEffect(() => {
+  //   const fetchEmployerData = async () => {
+  //     try {
+  //       const response = await getAllEmployers();
+  //       console.log(response.employers)
+  //       const employersData =
+  //         response && response.employers ? response.employers.flat() : [];
+  //       const sortedData = employersData.sort((a, b) => a.id - b.id);
+  //       setEmployers(sortedData);
+  //     } catch (error) {
+  //       console.error("Error fetching employers:", error);
+  //     }
+  //   };
+  //   fetchEmployerData();
+  // }, []);
+
   useEffect(() => {
-    const fetchEmployerData = async () => {
-      try {
-        const response = await getAllEmployers();
-        console.log(response.employers)
-        const employersData =
-          response && response.employers ? response.employers.flat() : [];
-        const sortedData = employersData.sort((a, b) => a.id - b.id);
-        setEmployers(sortedData);
-      } catch (error) {
-        console.error("Error fetching employers:", error);
-      }
-    };
-    fetchEmployerData();
-  }, []);
+  fetchEmployerData();
+}, []);
 
   const filteredEmployers = employers.filter(
     (emp) =>
@@ -83,6 +117,17 @@ function Employer() {
     }
   }, [selectedDate, selectedEmployer]);
 
+  //delete employer function
+  const handleDelete = async (id) => {
+  try {
+    await deleteEmployer(id);
+    alert("Deleted successfully");
+    fetchEmployerData(); // refresh list
+  } catch (error) {
+    console.error("Error deleting employer:", error);
+  }
+};
+
   return (
     <div className="employer-page">
       <div className="employer-container">
@@ -110,6 +155,7 @@ function Employer() {
                   <th>Email</th>
                   <th>Contact</th>
                   <th>Organization</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -130,6 +176,14 @@ function Employer() {
                       <td>{emp.emailId}</td>
                       <td>{emp.contact_number}</td>
                       <td>{emp.org_name}</td>
+                      <td>
+                        <button
+  className="delete-btn"
+  onClick={() => handleDelete(emp.id)}
+>
+  Delete
+</button>
+                      </td>
                     </tr>
                   ))
                 ) : (

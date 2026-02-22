@@ -1,4 +1,5 @@
 import adminApi from "../adminAxios";
+import mainApi from "../mainAxios";
 
 export const getAllEmployers = async () => {
   try {
@@ -14,4 +15,8 @@ export const getEmployerData = async (username) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+export const deleteEmployer = (id) => {
+  return mainApi.delete(`employer/delete/${id}/`);
 };
