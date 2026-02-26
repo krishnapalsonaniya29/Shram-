@@ -105,8 +105,15 @@ WSGI_APPLICATION = 'SAHAYAK.wsgi.application'
 #         'PORT': os.getenv('DB_PORT'),
 #     }
 # }
+# DATABASES = {
+#     'default': dj_database_url.parse(os.getenv("DATABASE_URL"))
+# }
 DATABASES = {
-    'default': dj_database_url.parse(os.getenv("DATABASE_URL"))
+    "default": dj_database_url.parse(
+        os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
 
 

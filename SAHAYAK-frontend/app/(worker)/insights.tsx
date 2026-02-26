@@ -136,6 +136,8 @@ export default function WorkerAnalysisPage() {
       };
       setWorkerData(workHistory);
       setTotalEarning(data ? data.data.this_month_salary : 0);
+      console.log("Header Stats:", data);
+      
       setLeaves(data ? data.data.leave_days : 0);
       setPresent(data ? data.data && data.data.working_days : 0);
     };

@@ -137,6 +137,7 @@ export default function WorkerHomePage() {
   const markPrev5DaysData = async () => {
     await markSatisfiedTo5DaysData();
     const data = await recentWorkResonseStatus();
+    console.log("Recent Work History:", data);
     setWorkHistory(data ? data.data : null);
   };
 

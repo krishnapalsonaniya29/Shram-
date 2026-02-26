@@ -43,7 +43,7 @@ const LandingSection = () => (
           GOVERNMENT OF MADHYA PRADESH
         </Text>
         <Text style={landingStyles.subHeaderText}>
-          Ministry of Labour & Employment
+         Labour Department
         </Text>
       </View>
     </View>
@@ -54,8 +54,8 @@ const LandingSection = () => (
       Sramik Rights & Account Management
     </Text>
     <Text style={landingStyles.description}>
-      Digital India initiative for transparent labor compliance, worker rights
-      protection, and automated wage management system.
+      Digital India initiative for transparent labour  compliance, worker rights
+      protection and automated wage management system.
     </Text>
 
     <View style={landingStyles.cardGrid}>
@@ -184,7 +184,7 @@ const LoginSection = () => {
           source={require("../../assets/images/logo.png")}
           style={loginStyles.logo}
         />
-        <Text style={loginStyles.headerTitle}>Ministry of Labour</Text>
+        <Text style={loginStyles.headerTitle}>Department of Labour</Text>
         <Text style={loginStyles.headerSubtitle}>Digital Platform</Text>
       </View>
 
