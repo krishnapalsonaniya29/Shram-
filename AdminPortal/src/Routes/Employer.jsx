@@ -1,3 +1,4 @@
+
 // import React, { useEffect, useState } from "react";
 // import "./Employer.css";
 // import {
@@ -5,7 +6,7 @@
 //   getEmployerData,
 // } from "../api/employerRoutes/allEmployers";
 // import { getAttendanceByEmployerAndDate } from "../api/employerRoutes/attendanceData";
-// // import { deleteEmployer } from "../api/employerRoutes/allEmployers";
+// import { deleteEmployer } from "../api/employerRoutes/allEmployers";
 // function Employer() {
 //   const [employers, setEmployers] = useState([]);
 //   const [searchTerm, setSearchTerm] = useState("");
@@ -20,55 +21,55 @@
 //   const [attendanceData, setAttendanceData] = useState([]);
 //   const [loadingAttendance, setLoadingAttendance] = useState(false);
 
-//   const fetchEmployerData = async () => {
-//   try {
-//     const response = await getAllEmployers();
-//     const employersData =
-//       response && response.employers ? response.employers.flat() : [];
-//     const sortedData = employersData.sort((a, b) => a.id - b.id);
-//     setEmployers(sortedData);
-//   } catch (error) {
-//     console.error("Error fetching employers:", error);
-//   }
-// };
-
-// // const fetchEmployerData = async () => {
+// //   const fetchEmployerData = async () => {
 // //   try {
 // //     const response = await getAllEmployers();
-
 // //     const employersData =
-// //       response && response.employers
-// //         ? response.employers.flat().filter((emp) => emp && emp.id)
-// //         : [];
-
+// //       response && response.employers ? response.employers.flat() : [];
 // //     const sortedData = employersData.sort((a, b) => a.id - b.id);
-
 // //     setEmployers(sortedData);
 // //   } catch (error) {
 // //     console.error("Error fetching employers:", error);
 // //   }
 // // };
 
+// const fetchEmployerData = async () => {
+//   try {
+//     const response = await getAllEmployers();
+
+//     const employersData =
+//       response && response.employers
+//         ? response.employers.flat().filter((emp) => emp && emp.id)
+//         : [];
+
+//     const sortedData = employersData.sort((a, b) => a.id - b.id);
+
+//     setEmployers(sortedData);
+//   } catch (error) {
+//     console.error("Error fetching employers:", error);
+//   }
+// };
+
+
+//   // useEffect(() => {
+//   //   const fetchEmployerData = async () => {
+//   //     try {
+//   //       const response = await getAllEmployers();
+//   //       console.log(response.employers)
+//   //       const employersData =
+//   //         response && response.employers ? response.employers.flat() : [];
+//   //       const sortedData = employersData.sort((a, b) => a.id - b.id);
+//   //       setEmployers(sortedData);
+//   //     } catch (error) {
+//   //       console.error("Error fetching employers:", error);
+//   //     }
+//   //   };
+//   //   fetchEmployerData();
+//   // }, []);
 
 //   useEffect(() => {
-//     const fetchEmployerData = async () => {
-//       try {
-//         const response = await getAllEmployers();
-//         console.log(response.employers)
-//         const employersData =
-//           response && response.employers ? response.employers.flat() : [];
-//         const sortedData = employersData.sort((a, b) => a.id - b.id);
-//         setEmployers(sortedData);
-//       } catch (error) {
-//         console.error("Error fetching employers:", error);
-//       }
-//     };
-//     fetchEmployerData();
-//   }, []);
-
-// //   useEffect(() => {
-// //   fetchEmployerData();
-// // }, []);
+//   fetchEmployerData();
+// }, []);
 
 //   const filteredEmployers = employers.filter(
 //     (emp) =>
@@ -118,15 +119,15 @@
 //   }, [selectedDate, selectedEmployer]);
 
 //   //delete employer function
-// //   const handleDelete = async (id) => {
-// //   try {
-// //     await deleteEmployer(id);
-// //     alert("Deleted successfully");
-// //     fetchEmployerData(); // refresh list
-// //   } catch (error) {
-// //     console.error("Error deleting employer:", error);
-// //   }
-// // };
+//   const handleDelete = async (id) => {
+//   try {
+//     await deleteEmployer(id);
+//     alert("Deleted successfully");
+//     fetchEmployerData(); // refresh list
+//   } catch (error) {
+//     console.error("Error deleting employer:", error);
+//   }
+// };
 
 //   return (
 //     <div className="employer-page">
@@ -176,14 +177,14 @@
 //                       <td>{emp.emailId}</td>
 //                       <td>{emp.contact_number}</td>
 //                       <td>{emp.org_name}</td>
-//                       {/* <td>
+//                       <td>
 //                         <button
 //   className="delete-btn"
 //   onClick={() => handleDelete(emp.id)}
 // >
 //   Delete
 // </button>
-//                       </td> */}
+//                       </td>
 //                     </tr>
 //                   ))
 //                 ) : (
@@ -304,14 +305,16 @@
 // }
 
 // export default Employer;
-import React, { useEffect, useState } from "react";
+
+import React, { useEffect, useState, useCallback } from "react";
 import "./Employer.css";
 import {
   getAllEmployers,
   getEmployerData,
+  deleteEmployer,
 } from "../api/employerRoutes/allEmployers";
 import { getAttendanceByEmployerAndDate } from "../api/employerRoutes/attendanceData";
-import { deleteEmployer } from "../api/employerRoutes/allEmployers";
+
 function Employer() {
   const [employers, setEmployers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -325,56 +328,27 @@ function Employer() {
   const [selectedDate, setSelectedDate] = useState("");
   const [attendanceData, setAttendanceData] = useState([]);
   const [loadingAttendance, setLoadingAttendance] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
-//   const fetchEmployerData = async () => {
-//   try {
-//     const response = await getAllEmployers();
-//     const employersData =
-//       response && response.employers ? response.employers.flat() : [];
-//     const sortedData = employersData.sort((a, b) => a.id - b.id);
-//     setEmployers(sortedData);
-//   } catch (error) {
-//     console.error("Error fetching employers:", error);
-//   }
-// };
+  const fetchEmployerData = useCallback(async () => {
+    try {
+      const response = await getAllEmployers();
 
-const fetchEmployerData = async () => {
-  try {
-    const response = await getAllEmployers();
+      const employersData =
+        response && response.employers
+          ? response.employers.flat().filter((emp) => emp && emp.id)
+          : [];
 
-    const employersData =
-      response && response.employers
-        ? response.employers.flat().filter((emp) => emp && emp.id)
-        : [];
-
-    const sortedData = employersData.sort((a, b) => a.id - b.id);
-
-    setEmployers(sortedData);
-  } catch (error) {
-    console.error("Error fetching employers:", error);
-  }
-};
-
-
-  // useEffect(() => {
-  //   const fetchEmployerData = async () => {
-  //     try {
-  //       const response = await getAllEmployers();
-  //       console.log(response.employers)
-  //       const employersData =
-  //         response && response.employers ? response.employers.flat() : [];
-  //       const sortedData = employersData.sort((a, b) => a.id - b.id);
-  //       setEmployers(sortedData);
-  //     } catch (error) {
-  //       console.error("Error fetching employers:", error);
-  //     }
-  //   };
-  //   fetchEmployerData();
-  // }, []);
+      const sortedData = employersData.sort((a, b) => a.id - b.id);
+      setEmployers(sortedData);
+    } catch (error) {
+      console.error("Error fetching employers:", error);
+    }
+  }, []);
 
   useEffect(() => {
-  fetchEmployerData();
-}, []);
+    fetchEmployerData();
+  }, [fetchEmployerData]);
 
   const filteredEmployers = employers.filter(
     (emp) =>
@@ -386,9 +360,10 @@ const fetchEmployerData = async () => {
     if (selectedEmployer) {
       const fetchDetails = async () => {
         try {
-          const employerData = await getEmployerData(selectedEmployer.employer);
-          console.log(employerData)
-          setReportStatistics(employerData.reports)
+          const employerData = await getEmployerData(
+            selectedEmployer.employer
+          );
+          setReportStatistics(employerData.reports);
         } catch (err) {
           console.error("Error fetching employer details:", err);
         }
@@ -407,10 +382,12 @@ const fetchEmployerData = async () => {
           const month = dateObj.getMonth() + 1;
           const year = dateObj.getFullYear();
           const formattedDate = `${year}-${month}-${day}`;
+
           const response = await getAttendanceByEmployerAndDate(
             selectedEmployer.id,
             formattedDate
           );
+
           setAttendanceData(response.workers || []);
         } catch (err) {
           console.error("Error fetching attendance:", err);
@@ -419,20 +396,35 @@ const fetchEmployerData = async () => {
           setLoadingAttendance(false);
         }
       };
+
       fetchAttendance();
     }
   }, [selectedDate, selectedEmployer]);
 
-  //delete employer function
-  const handleDelete = async (id) => {
-  try {
-    await deleteEmployer(id);
-    alert("Deleted successfully");
-    fetchEmployerData(); // refresh list
-  } catch (error) {
-    console.error("Error deleting employer:", error);
-  }
-};
+  const handleDelete = async () => {
+    if (!selectedEmployer) return;
+
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete ${selectedEmployer.employer}? This action cannot be undone.`
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      setDeleteLoading(true);
+      await deleteEmployer(selectedEmployer.id);
+
+      alert("Employer deleted successfully");
+
+      setSelectedEmployer(null);
+      await fetchEmployerData();
+    } catch (error) {
+      console.error("Error deleting employer:", error);
+      alert("Failed to delete employer.");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   return (
     <div className="employer-page">
@@ -461,17 +453,12 @@ const fetchEmployerData = async () => {
                   <th>Email</th>
                   <th>Contact</th>
                   <th>Organization</th>
-                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredEmployers.length > 0 ? (
                   filteredEmployers.map((emp) => (
-                    <tr
-                      key={
-                        emp.id || emp.emailId || emp.org_name || Math.random()
-                      }
-                    >
+                    <tr key={emp.id}>
                       <td>{emp.id}</td>
                       <td
                         className="clickable"
@@ -482,18 +469,10 @@ const fetchEmployerData = async () => {
                       <td>{emp.emailId}</td>
                       <td>{emp.contact_number}</td>
                       <td>{emp.org_name}</td>
-                      <td>
-                        <button
-  className="delete-btn"
-  onClick={() => handleDelete(emp.id)}
->
-  Delete
-</button>
-                      </td>
                     </tr>
                   ))
                 ) : (
-                  <tr key="no-employer">
+                  <tr>
                     <td colSpan="5" className="no-data">
                       No employers found 😕
                     </td>
@@ -504,18 +483,36 @@ const fetchEmployerData = async () => {
           </>
         ) : (
           <>
+          <div className="profile-header">
             <button
               className="back-btn"
               onClick={() => setSelectedEmployer(null)}
             >
               ← Back
             </button>
-
+             <button
+                className="delete-btn profile-delete"
+                onClick={handleDelete}
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? "Deleting..." : "Delete Employer"}
+              </button>
+          </div>
             <div className="profile-section">
               <h2>{selectedEmployer.employer}</h2>
+
+              {/* <button
+                className="delete-btn profile-delete"
+                onClick={handleDelete}
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? "Deleting..." : "Delete Employer"}
+              </button> */}
+
               <div className="employer-details-grid">
                 <p>
-                  <strong>Email:</strong> {selectedEmployer?.emailId || "N/A"}
+                  <strong>Email:</strong>{" "}
+                  {selectedEmployer?.emailId || "N/A"}
                 </p>
                 <p>
                   <strong>Contact Number:</strong>{" "}
@@ -526,18 +523,22 @@ const fetchEmployerData = async () => {
                   {selectedEmployer?.org_name || "N/A"}
                 </p>
                 <p>
-                  <strong>Address:</strong> {selectedEmployer?.address || "N/A"}
+                  <strong>Address:</strong>{" "}
+                  {selectedEmployer?.address || "N/A"}
                 </p>
 
                 <div className="reports-summary">
                   <p>
-                    <strong>Total Reports:</strong> {reportStatistics.total}
+                    <strong>Total Reports:</strong>{" "}
+                    {reportStatistics.total}
                   </p>
                   <p className="pending-reports">
-                    <strong>Pending:</strong> {reportStatistics.pending}
+                    <strong>Pending:</strong>{" "}
+                    {reportStatistics.pending}
                   </p>
                   <p className="resolved-reports">
-                    <strong>Resolved:</strong> {reportStatistics.resolved}
+                    <strong>Resolved:</strong>{" "}
+                    {reportStatistics.resolved}
                   </p>
                 </div>
               </div>
@@ -574,9 +575,7 @@ const fetchEmployerData = async () => {
                   {attendanceData.map((record, index) => (
                     <div
                       className="attendance-row"
-                      key={`${record.workerUsername || "unknown"}-${
-                        record.date || index
-                      }`}
+                      key={`${record.workerUsername}-${index}`}
                     >
                       <div>{record.workerUsername}</div>
                       <div>
@@ -586,7 +585,9 @@ const fetchEmployerData = async () => {
                       </div>
                       <div
                         className={
-                          record.amount_given ? "amount-paid" : "amount-pending"
+                          record.amount_given
+                            ? "amount-paid"
+                            : "amount-pending"
                         }
                       >
                         {record.amount_given
@@ -598,7 +599,9 @@ const fetchEmployerData = async () => {
                 </div>
               ) : (
                 selectedDate && (
-                  <p className="no-data">No attendance for this date.</p>
+                  <p className="no-data">
+                    No attendance for this date.
+                  </p>
                 )
               )}
             </div>

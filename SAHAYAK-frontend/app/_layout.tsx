@@ -49,7 +49,8 @@ export default function RootLayout() {
   useEffect(() => {
     if (!loading) {
       if (!isLoggedIn) {
-        router.replace("/login");
+        //router.replace("/login");
+        router.replace("/(auth)/login");
       } else if (role === "employer") {
         router.replace("/(employer)");
       } else if (role === "worker") {
